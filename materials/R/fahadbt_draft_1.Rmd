@@ -1,0 +1,478 @@
+
+---
+title: "Customer review draft.1"
+author: "Fahad BinThabit"
+date: "04/11/2020"
+output: html_document
+---
+
+
+
+```{r ,echo=FALSE}
+# packages required
+library(dplyr)
+library(tidyverse)
+library(ggplot2)
+library(rsample)
+library(recipes)
+library(caret)
+library(wordcloud)
+library(RColorBrewer)
+library(wordcloud2)
+library(tm)
+library(readr)
+library(stringr)
+library(gganimate)
+library(devtools)
+library(zoo)
+library(Rmisc)
+library(gifski)
+library(av)
+library(magick)
+library(kableExtra)
+theme_set(theme_bw())
+
+
+```
+
+
+### Customer review
+
+```{r ,echo=FALSE}
+
+# customer review data
+data <- read.csv('redmi6.csv') %>%
+  na.omit(data)
+fixed <- data %>%
+  mutate(C_Rating = substr(data$Rating, 0, 1)) %>%
+  mutate(C_Ratingn = as.numeric(C_Rating)) %>% 
+  select(-Rating, -C_Rating) %>%
+  mutate(C_Rating = substr(data$Useful, 0, 1)) %>%
+  mutate(C_usefuln = as.numeric(C_Rating)) %>% 
+  select(-Useful, -C_Rating) %>%
+  mutate(datefix = gsub("^.{0,2}", "", data$Date)) %>%
+  mutate(datefix1 = as.Date(datefix,format='%d %B %Y')) %>%
+  select(-Date, -datefix) 
+
+fixed[is.na(fixed)] <- 3.170213
+
+
+fixed %>%
+ kable()
+
+
+
+```
+### Customer behavour
+
+
+
+```{}
+meanuse <- fixed %>%
+  filter(C_usefuln > 0) %>%
+  mutate(avg = mean(C_usefuln))
+
+fixed[is.na(fixed)] <- 0
+```
+
+
+```{r,echo=FALSE}
+theme_set(theme_bw())
+
+p <- ggplot(
+  fixed, 
+  aes(x =C_usefuln , y=C_Ratingn  , colour = Category), size = nrow 
+  ) +
+  geom_point(show.legend = TRUE, alpha = 0.7) +
+  scale_color_viridis_d() +
+  scale_size(range = c(2, 12)) +
+  scale_x_log10() +
+  labs(x = "found Useful", y = "Rating")
+
+
+vb <- p + transition_time(datefix1) +
+  labs(title = "Time: {frame_time}")
+
+
+
+
+vb
+```
+```{r,echo=FALSE}
+
+kk <- p + transition_time(datefix1) +
+  labs(title = "Year: {frame_time}") +
+  shadow_wake(wake_length = 0.1, alpha = FALSE)
+
+kk
+```
+
+```{r,echo=FALSE}
+
+theme_set(theme_bw())
+p <- ggplot(
+  fixed,
+  aes(datefix1, C_Ratingn, group = C_usefuln, color = factor(Category))
+  ) +
+  geom_line() +
+  scale_color_viridis_d() +
+  labs(x = "Date", y = "Rating") +
+  theme(legend.position = "top")
+plotit <- p + 
+  geom_point() +
+  transition_reveal(datefix1)
+plotit 
+
+
+```
+
+# word cloud before stemming 
+```{r,echo=FALSE}
+
+
+#Create a vector containing only the text
+text <- data$Comments
+# Create a corpus  
+docs <- Corpus(VectorSource(text))
+
+dtm <- TermDocumentMatrix(docs) 
+matrix <- as.matrix(dtm) 
+words <- sort(rowSums(matrix),decreasing=TRUE) 
+df <- data.frame(word = names(words),freq=words)
+```
+
+
+
+
+
+
+
+```{r,echo=FALSE}
+set.seed(1234) # for reproducibility 
+wordcloud::wordcloud(words = df$word, freq = df$freq, min.freq = 10, max.words=200, random.order=FALSE, rot.per=0.35, colors=brewer.pal(8, "Dark2"), scale=c(3.5,0.25), )
+```
+
+
+
+```{r,echo=FALSE}
+
+rp <- removePunctuation(text) 
+rp1 <-  removeNumbers(rp)
+rp2 <- stripWhitespace(rp1)
+
+
+```
+
+
+
+```{r,echo=FALSE}
+#clean
+
+
+
+rw <- removeWords(rp2, stopwords("en"))
+
+
+
+```
+
+# word cloud after stemming 
+
+```{r,echo=FALSE}
+
+
+
+docs1 <- Corpus(VectorSource(rw))
+
+dtm1 <- TermDocumentMatrix(docs1) 
+matrix1 <- as.matrix(dtm1) 
+words1 <- sort(rowSums(matrix1),decreasing=TRUE) 
+df1 <- data.frame(word = names(words1),freq=words1)
+
+wordcloud::wordcloud(words = df1$word, freq = df1$freq, min.freq = 10, max.words=200, random.order=FALSE, rot.per=0.35, colors=brewer.pal(8, "Dark2"), scale=c(3.5,0.25), )
+```
+
+
+
+```{r,echo=FALSE}
+# two consequtive word 
+
+```
+
+
+
+
+
+
+```{r}
+
+
+```
+```{r}
+
+```
+
+
+```{,echo=FALSE}
+
+
+c1r <- as.numeric(C_Rating)
+
+c2r <- as.numeric(unlist(c1r))
+
+
+
+
+
+
+hist(c2r) 
+
+ggplot(c2r, aes(x = c2r, y= ))
+
+
+```
+
+
+
+```{}
+
+
+
+c2r_m <- c2r %>% mean()
+
+c2r_sd <- c2r %>% sd()
+
+ggplot(c2r, aes(x=factor(value)))+
+  geom_bar(stat="bin", width=0.7, fill="steelblue")+
+  theme_minimal()
+
+# Horizontal bar plot
+p + coord_flip()
+
+
+sample(c2r, size = 10, replace = TRUE)
+die.rolls <- sample(c2r, size = 20, replace = TRUE)
+die.rolls
+
+
+two.dice <- function(){
+  dice <- sample(c2r, size = 20, replace = TRUE)
+  return(replicate(10, dice))
+}
+  
+more.sims <- replicate(100, two.dice())
+table(more.sims)/length(more.sims) 
+
+
+plot(table(more.sims)/length(more.sims), 
+     xlab = 'Sum', ylab = 'Relative Frequency', main = '1000 Rolls of 2 Fair Dice')  
+
+
+two.dice()
+
+
+
+
+x <- c2r
+y <- rnorm(c2r, mean=c2r_m, sd=c2r_sd)
+hist(x, breaks=50) 
+
+hist(y)
+
+
+
+#set.seed(123)
+#split <- initial_split(c2r, strata = #"Sale_Price")
+#ames_train <- training(split)
+#ames_test <- testing(split)
+
+```
+
+
+
+```{}
+set.seed(123)
+split <- initial_split(ames, strata = "Sale_Price")
+ames_train <- training(split)
+ames_test <- testing(split)
+```
+
+
+
+
+
+
+# Visualizing Missing Data
+
+An uncleaned version of Ames housing data:
+
+```{ slide-8}
+sum(is.na(AmesHousing::ames_raw))
+
+AmesHousing::ames_raw %>%
+  is.na() %>%
+  reshape2::melt() %>%
+  ggplot(aes(Var2, Var1, fill = value)) + 
+    geom_raster() + 
+    coord_flip() +
+    scale_y_continuous(NULL, expand = c(0, 0)) +
+    scale_fill_grey(name = "", labels = c("Present", "Missing")) +
+    xlab("Observation") +
+    theme(axis.text.y  = element_text(size = 4))
+
+
+```
+
+```{ slide-9}
+visdat::vis_miss(AmesHousing::ames_raw, cluster = TRUE)
+```
+
+# Structural vs random 
+
+Missing values can be a result of many different reasons; however, these reasons are usually lumped into two categories: 
+
+* informative missingess
+* missingness at random
+
+```{ slide-10}
+AmesHousing::ames_raw %>% 
+  filter(is.na(`Garage Type`)) %>% 
+  select(`Garage Type`, `Garage Cars`, `Garage Area`)
+```
+
+# Options for filtering
+
+Filtering options include:
+
+- removing 
+   - zero variance features
+   - near-zero variance features
+   - highly correlated features (better to do dimension reduction)
+
+- Feature selection
+   - beyond scope of module
+   - see [Applied Predictive Modeling, ch. 19](http://appliedpredictivemodeling.com/)
+
+```{ slide-16}
+caret::nearZeroVar(ames_train, saveMetrics= TRUE) %>% 
+  rownames_to_column() %>% 
+  filter(nzv)
+```
+
+# Label encoding 
+
+* One-hot and dummy encoding are not good when:
+   - you have a lot of categorical features
+   - with high cardinality
+   - or you have ordinal features
+
+* Label encoding:
+   - pure numeric conversion of the levels of a categorical variable
+   - most common: ordinal encoding
+
+Quality variables with natural ordering:
+
+```{ slide-23}
+ames_train %>% select(matches("Qual|QC|Qu"))
+```
+
+```{ slide-24}
+count(ames_train, Overall_Qual)
+```
+
+```{ slide-25}
+recipe(Sale_Price ~ ., data = ames_train) %>%
+  step_integer(Overall_Qual) %>%
+  prep(ames_train) %>%
+  bake(ames_train) %>%
+  count(Overall_Qual)
+```
+
+
+# Putting the process together
+
+* __recipes__ provides a convenient way to create feature engineering blue prints
+* 3 main components to consider
+   1. recipe: define your pre-processing blue print
+   2. prepare: estimate parameters based on training data
+   3. bake/juice: apply blue print to new data
+
+Check out all the available `step_xxx()` functions at http://bit.ly/step_functions
+
+```{ slide-35}
+blueprint <- recipe(Sale_Price ~ ., data = ames_train) %>%
+  step_nzv(all_nominal()) %>%
+  step_center(all_numeric(), -all_outcomes()) %>%
+  step_scale(all_numeric(), -all_outcomes()) %>%
+  step_integer(matches("Qual|Cond|QC|Qu"))
+
+blueprint
+```
+
+```{ slide-36}
+prepare <- prep(blueprint, training = ames_train)
+prepare
+```
+
+```{ slide-37}
+baked_train <- bake(prepare, new_data = ames_train)
+baked_test <- bake(prepare, new_data = ames_test)
+
+baked_train
+```
+
+Let's add a blue print to our modeling process for analyzing the Ames housing data:
+
+1. Split into training vs testing data
+2. Create feature engineering blue print
+3. Specify a resampling procedure
+4. Create our hyperparameter grid
+5. Execute grid search
+6. Evaluate performance
+
+```{ slide-39}
+# 1. stratified sampling with the rsample package
+set.seed(123)
+split  <- initial_split(ames, prop = 0.7, strata = "Sale_Price")
+ames_train  <- training(split)
+ames_test   <- testing(split)
+
+# 2. Feature engineering
+blueprint <- recipe(Sale_Price ~ ., data = ames_train) %>%
+  step_nzv(all_nominal()) %>%
+  step_integer(matches("Qual|Cond|QC|Qu")) %>%
+  step_center(all_numeric(), -all_outcomes()) %>%
+  step_scale(all_numeric(), -all_outcomes()) %>%
+  step_dummy(all_nominal(), -all_outcomes(), one_hot = TRUE)
+
+# 3. create a resampling method
+cv <- trainControl(
+  method = "repeatedcv", 
+  number = 10, 
+  repeats = 5
+  )
+
+# 4. create a hyperparameter grid search
+hyper_grid <- expand.grid(k = seq(2, 25, by = 1))
+
+# 5. execute grid search with knn model
+#    use RMSE as preferred metric
+knn_fit <- train(
+  blueprint, 
+  data = ames_train, 
+  method = "knn", 
+  trControl = cv, 
+  tuneGrid = hyper_grid,
+  metric = "RMSE"
+  )
+
+# 6. evaluate results
+# print model results
+knn_fit
+
+# plot cross validation results
+ggplot(knn_fit$results, aes(k, RMSE)) + 
+  geom_line() +
+  geom_point() +
+  scale_y_continuous(labels = scales::dollar)
+```
