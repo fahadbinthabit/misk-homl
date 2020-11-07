@@ -1,0 +1,372 @@
+---
+title: "reg"
+author: "Fahad BinThabit"
+date: "06/11/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+```{r}
+library(dplyr)     # for data wrangling
+library(ggplot2)   # for awesome plotting
+library(rsample)   # for data splitting
+library(tidyverse)
+# Modeling packages
+library(caret)     # for logistic regression modeling
+
+# Model interpretability packages
+library(vip)       # variable importance
+library(ROCR)      # ROC curve
+```
+```{r}
+library(sf)
+library(raster)
+library(dplyr)
+library(spData)
+library(tmap)    # for static and interactive maps
+library(leaflet) # for interactive maps
+library(ggplot2) # tidyverse data visualization package
+library(ggmap)
+library(maps)
+library(mapdata)
+library(plyr)
+library(tidyverse)
+
+```
+
+This is an R Markdown document. Markdown is a simple formatting syntax for 
+
+```{r}
+df <- read.csv("for learning 1.csv")
+df <- na.omit(df)
+
+
+```
+
+```{r}
+df = subset(df, select = -c(Policy.Holder.DOB
+,Quote.Inception,Year.Made
+) )
+
+df$Occupation = as.numeric(factor(df$Occupation, levels = unique(df$Occupation)))
+df$Gender = as.numeric(factor(df$Gender, levels = unique(df$Gender)))
+df$Plate.Type = as.numeric(factor(df$Plate.Type, levels = unique(df$Plate.Type)))
+df$ID.Type = as.numeric(factor(df$ID.Type, levels = unique(df$ID.Type)))
+df$Marital.Status = as.numeric(factor(df$Marital.Status, levels = unique(df$Marital.Status)))
+df$Status = as.numeric(factor(df$Status, levels = unique(df$Status)))
+
+df$Make = as.numeric(factor(df$Make, levels = unique(df$Make)))
+df$Model = as.numeric(factor(df$Model, levels = unique(df$Model)))
+df$Education = as.numeric(factor(df$Education, levels = unique(df$Education)))
+df$Region = as.numeric(factor(df$Region, levels = unique(df$Region)))
+
+df$ID.Type <- as.numeric(df$ID.Type)
+df$Gross.Premium <- as.numeric(df$Gross.Premium)
+df$Gender <- as.numeric(df$Gender)
+df$Marital.Status <- as.numeric(df$Marital.Status)
+df$Plate.Type <- as.numeric(df$Plate.Type)
+df$Status <- as.factor(df$Status)
+
+df$Status <- revalue(df$Status, c("1"="Yes"))
+df$Status <- revalue(df$Status, c("2"="No"))
+
+df
+```
+
+
+
+
+
+```{r}
+df<- df[-seq(nrow(df),nrow(df)-270000),]
+df <- sample_n(df, 1000)
+df
+```
+```{r}
+
+
+```
+
+
+
+
+```{}
+df$Gender <- revalue(df$Gender, c("Female"=1))
+df$Gender <- revalue(df$Gender, c("Male"=0))
+head(df$Gender)
+
+
+df$Plate.Type <- revalue(df$Plate.Type, c("Public Transport"=1))
+df$Plate.Type <- revalue(df$Plate.Type, c("Private Car"=0))
+head(df$Plate.Type)
+
+df$ID.Type <- revalue(df$ID.Type, c("Iqama"=1))
+df$ID.Type <- revalue(df$ID.Type, c("National ID"=0))
+head(df$ID.Type)
+
+
+df$Status <- revalue(df$Status, c("Issued"=1))
+df$Status <- revalue(df$Status, c("Pending"=0))
+head(df$Status)
+
+
+df$Marital.Status <- revalue(df$Marital.Status, c("Single"=1))
+df$Marital.Status <- revalue(df$Marital.Status, c("Married"=0))
+head(df$Marital.Status)
+```
+
+
+
+```{}
+
+
+
+
+
+
+
+df$Occupation <- revalue(df$Occupation, c("Governmental Sector"=1))
+df$Occupation <- revalue(df$Occupation, c("Private Sector"=1))
+df$Occupation <- revalue(df$Occupation, c("Private Business"=1))
+df$Occupation <- revalue(df$Occupation, c("Retired"=1))
+df$Occupation <- revalue(df$Occupation, c("Retired"=1))
+df$Occupation[df$Occupation == "Retired"] <- "1"
+df$Occupation[df$Occupation == "Student"] <- "0"
+df$Occupation[df$Occupation == "UNEMPLOYED"] <- "0"
+df$Occupation <- revalue(df$Occupation, c("Student"=0))
+df$Occupation <- revalue(df$Occupation, c("Student"=0))
+df$Occupation <- revalue(df$Occupation,c("UNEMPLOYED"=0))
+df$Status = as.factor(df$Status)
+
+df
+
+```
+```{}
+
+df$ID.Type <- as.numeric(df$ID.Type)
+df$Gross.Premium <- as.numeric(df$Gross.Premium)
+df$Gender <- as.numeric(df$Gender)
+df$Marital.Status <- as.numeric(df$Marital.Status)
+df$Plate.Type <- as.numeric(df$Plate.Type)
+
+
+
+df <- na.omit(df)
+
+
+```
+
+
+
+
+
+```{r}
+
+
+
+
+
+```
+
+For this section we'll use the following packages:
+
+```{r}
+# Helper packages
+library(dplyr)     # for data wrangling
+library(ggplot2)   # for awesome plotting
+library(rsample)   # for data splitting
+
+# Modeling packages
+library(caret)     # for logistic regression modeling
+
+# Model interpretability packages
+library(vip)       # variable importance
+library(ROCR)      # ROC curve
+```
+
+To illustrate logistic regression concepts we'll use the employee attrition data, where our intent is to predict the `Attrition` response variable (coded as `"Yes"`/`"No"`). As in the previous module, we'll set aside 30% of our data as a test set to assess our generalizability error.
+
+```{r}
+
+# rsample::attrition data.
+set.seed(123)  # for reproducibility
+churn_split <- initial_split(df, prop = .7, strata = "Status")
+churn_train <- training(churn_split)
+churn_test  <- testing(churn_split)
+```
+
+# Simple logistic regression
+
+
+
+
+```{r}
+
+```
+
+
+
+
+
+
+```{r cars}
+
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+
+
+model1 <- glm(Status ~ Gross.Premium, family = "binomial", data = churn_train)
+model2 <- glm(Status ~ Make , family = "binomial", data = churn_train)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+```{r}
+tidy(model1)
+tidy(model2)
+```
+
+
+```{r}
+exp(coef(model1))
+exp(coef(model2))
+```
+
+
+```{r}
+model3 <- glm(
+  Status ~ Gross.Premium + Make,
+  family = "binomial", 
+  data = churn_train
+  )
+tidy(model3)
+```
+
+
+```{r}
+set.seed(123)
+cv_model1 <- train(
+  Status ~ Gross.Premium	 , 
+  data = churn_train, 
+  method = "glm",
+  family = "binomial",
+  trControl = trainControl(method = "cv", number = 10)
+)
+set.seed(123)
+cv_model2 <- train(
+  Status ~ Gross.Premium	 + Make, 
+  data = churn_train, 
+  method = "glm",
+  family = "binomial",
+  trControl = trainControl(method = "cv", number = 10)
+)
+
+
+```
+
+
+```{r}
+set.seed(123)
+cv_model3 <- train(
+  Status ~ ., 
+  data = churn_train, 
+  method = "glm",
+  family = "binomial",
+  trControl = trainControl(method = "cv", number = 10)
+)
+```
+
+
+
+
+```{r}
+# extract out of sample performance measures
+summary(
+  resamples(
+    list(
+      model1 = cv_model1, 
+      model2 = cv_model2, 
+      model3 = cv_model3
+    )
+  )
+)$statistics$Accuracy
+```
+
+# Confusion matrix
+
+```{r glm-confusion-matrix}
+# predict class
+pred_class <- predict(cv_model3, churn_train)
+
+# create confusion matrix
+confusionMatrix(
+  data = relevel(pred_class, ref = "Yes"), 
+  reference = relevel(churn_train$Status, ref = "Yes")
+)
+```
+
+# ROC curve
+
+```{r logistic-regression-roc}
+# Compute predicted probabilities
+# 
+m1_prob <- predict(cv_model1, churn_train, type = "prob")$Yes
+m3_prob <- predict(cv_model3, churn_train, type = "prob")$Yes
+
+# Compute AUC metrics for cv_model1 and cv_model3
+perf1 <- prediction(m1_prob, churn_train$Status) %>%
+  performance(measure = "tpr", x.measure = "fpr")
+perf2 <- prediction(m3_prob, churn_train$Status) %>%
+  performance(measure = "tpr", x.measure = "fpr")
+
+# Plot ROC curves for cv_model1 and cv_model3
+plot(perf1, col = "black", lty = 2)
+plot(perf2, add = TRUE, col = "blue")
+legend(0.8, 0.2, legend = c("cv_model1", "cv_model3"),
+       col = c("black", "blue"), lty = 2:1, cex = 0.6)
+```
+
+# Feature interpretation
+
+Top 20 influential variables:
+
+```{r glm-vip, fig.cap="Top 20 most important variables for the PLS model."}
+vip(cv_model3, num_features = 20)
+```
+
+PDPs for the top three categorical predictors (`OverTime`, `JobSatisfaction`, and `EnvironmentSatisfaction`) illustrate the change in predicted probability of attrition based on the employee's status for each predictor.
+
+```{r glm-pdp, echo=FALSE, fig.height=5, fig.width=7, fig.cap="Partial dependence plots for the first four most important variables.  We can see how the predicted probability of attrition changes for each value of the influential predictors."}
+pred.fun <- function(object, newdata) {
+  Yes <- mean(predict(object, newdata, type = "prob")$Yes)
+  as.data.frame(Yes)
+}
+p1 <- pdp::partial(cv_model3, pred.var = "Gross.Premium", pred.fun = pred.fun) %>% 
+  ggplot(aes(Gross.Premium, yhat)) + geom_point() + ylim(c(0, 1))
+p2 <- pdp::partial(cv_model3, pred.var = "Model", pred.fun = pred.fun) %>% 
+  ggplot(aes(Model, yhat)) + geom_point() + ylim(c(0, 1))
+p3 <- pdp::partial(cv_model3, pred.var = "Marital.Status", pred.fun = pred.fun, gr = 10) %>% 
+  ggplot(aes(Marital.Status, yhat)) + geom_point() + scale_x_continuous(breaks = 0:9) + ylim(c(0, 1))
+  
+p4 <- pdp::partial(cv_model3, pred.var = "ID.Type", pred.fun = pred.fun) %>% 
+  ggplot(aes(ID.Type, yhat)) + geom_point() + ylim(c(0, 1))
+grid.arrange(p1, p2, p3, p4, nrow = 10)
+```
+
+
+
+
+```{r}
+
+```
+
+
+
